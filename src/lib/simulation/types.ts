@@ -113,6 +113,7 @@ export interface EnvironmentState {
 export interface TelemetryState {
   position: { x: number; y: number; z: number };
   velocity: { x: number; y: number; z: number };
+  acceleration?: { x: number; y: number; z: number }; // m/s^2 linear acceleration in world frame
   rotation: { pitch: number; roll: number; yaw: number }; // radians
   altitude: number; // meters Above Ground Level (AGL)
   altitudeMsl?: number; // meters Mean Sea Level
@@ -123,6 +124,7 @@ export interface TelemetryState {
   batteryVoltage?: number; // V
   batteryCurrentAmps?: number; // A
   batteryPowerWatts?: number; // W
+  batteryRemainingMah?: number; // mAh remaining energy
   flightTimeSeconds: number;
   flightMode: FlightMode;
   isArmed: boolean;
@@ -229,16 +231,42 @@ export interface FlightAnalysisReport {
 }
 
 export interface ReplayFrame {
-  timeSeconds: number;
-  position: { x: number; y: number; z: number };
-  rotation: { pitch: number; roll: number; yaw: number };
-  velocity: { x: number; y: number; z: number };
-  motorOutputs: number[];
-  batteryLevel: number;
-  altitudeAgl: number;
-  groundSpeedKmh: number;
-  flightMode: FlightMode;
+  // Monotonic identification & sequence
+  sequenceNumber?: number; // Monotonically increasing frame index within flight run
+  flightRunId?: string; // Globally unique flight run identifier
+  timestampIso?: string; // UTC wall-clock timestamp (ISO 8601)
+
+  // Timing & Mission Context
+  timeSeconds: number; // Monotonic simulation time in seconds
+  airframeType?: DroneCategory; // "quadcopter" | "hexacopter" | "octacopter"
+  targetHelipadId?: string; // Designated target landing pad identifier
+
+  // 6-DoF Kinematics (Three.js coordinates: Y=up, X=east, Z=south)
+  position: { x: number; y: number; z: number }; // meters
+  rotation: { pitch: number; roll: number; yaw: number }; // radians (-pi to +pi)
+  velocity: { x: number; y: number; z: number }; // m/s
+  acceleration?: { x: number; y: number; z: number }; // m/s^2
+  altitudeAgl: number; // meters Above Ground Level (AGL)
+  altitudeMsl?: number; // meters Mean Sea Level (MSL)
+  groundSpeedKmh: number; // km/h horizontal ground speed
+  verticalSpeedMs?: number; // m/s (+ climb, - descent)
+  headingDeg?: number; // degrees (0-360)
+
+  // Flight State & Control
+  flightMode: FlightMode; // "MANUAL" | "HOVER" | "RTH" | "AUTO LAND" | "ORBIT"
+  isArmed?: boolean;
   eventMarker?: string;
+
+  // Electrical & Battery Dynamics
+  batteryLevel: number; // 0 - 100 % (SoC)
+  batteryVoltage?: number; // Volts (terminal voltage under sag)
+  batteryCurrentAmps?: number; // Amperes
+  batteryPowerWatts?: number; // Watts
+  batteryRemainingMah?: number; // mAh
+
+  // Propulsion & Motor Channels (supports up to 8 motors)
+  motorOutputs: number[]; // [0.0 - 1.0] per active motor
+  motorRpms?: number[]; // RPM per motor
 }
 
 export interface TutorialStep {

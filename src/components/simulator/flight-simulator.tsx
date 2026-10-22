@@ -459,6 +459,12 @@ export function FlightSimulator({ selectedDrone, initialDigitalTwin, onExit }: F
     setCurrentInsight(null);
     setInsightHistory([]);
     setCoachSessionSummary(null);
+    flightRecorderRef.current.reset();
+    flightRecorderRef.current.setFlightContext({
+      droneName: selectedDrone.name,
+      airframeType: selectedDrone.platformId,
+      targetHelipadId: spawnConfigRef.current?.helipadId,
+    });
     if (physicsEngineRef.current) {
       physicsEngineRef.current.resetCrash();
       const sp = spawnConfigRef.current;
@@ -990,6 +996,14 @@ export function FlightSimulator({ selectedDrone, initialDigitalTwin, onExit }: F
     physicsEngineRef.current = physics;
     simClockRef.current.reset();
     simClockRef.current.start();
+
+    // Configure standardized flight-run recording context
+    flightRecorderRef.current.reset();
+    flightRecorderRef.current.setFlightContext({
+      droneName: selectedDrone.name,
+      airframeType: dtConfig.identity.category,
+      targetHelipadId: spawnConfig.helipadId,
+    });
 
 
     // 8. CHASE CAMERA

@@ -845,6 +845,7 @@ export class FlightPhysicsEngine {
     return {
       position: { x: this.posX, y: this.posY, z: this.posZ },
       velocity: { x: this.velX, y: this.velY, z: this.velZ },
+      acceleration: { x: this.accelX, y: this.accelY, z: this.accelZ },
       rotation: { pitch: this.pitch, roll: this.roll, yaw: this.yaw },
       altitude: altitudeMeters,
       altitudeMsl,
@@ -855,6 +856,7 @@ export class FlightPhysicsEngine {
       batteryVoltage: battState.terminalVoltage,
       batteryCurrentAmps: battState.currentAmps,
       batteryPowerWatts: Math.round(battState.powerWatts),
+      batteryRemainingMah: Math.round(battState.remainingMah),
       flightTimeSeconds: Math.floor(this.flightTime),
       flightMode,
       isArmed: this.isArmed && !this.crashState?.isCrashed,

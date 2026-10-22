@@ -16,6 +16,7 @@ import {
   Activity,
   CloudSun,
   FileSpreadsheet,
+  FileJson,
   CheckCircle2,
   XCircle,
   Gauge,
@@ -28,6 +29,7 @@ import {
 import { DroneModel } from "@/types/drone";
 import { TelemetryState, EnvironmentState, ReplayFrame } from "@/lib/simulation/types";
 import { FlightCoachInsight } from "@/lib/simulation/flight-coach-types";
+import { TELEMETRY_CSV_HEADERS, formatFrameToCSVRow } from "@/lib/simulation/flight-recorder";
 
 interface Stats {
   startTime: number;
@@ -151,54 +153,65 @@ export function PostFlightReportModal({
     };
   }, [stats, telemetry, insights]);
 
-  // Export CSV Blackbox
+  // Export Standardized CSV Blackbox
   const handleExportCSV = () => {
-    const headers = [
-      "Time_Seconds",
-      "Altitude_AGL_Meters",
-      "Ground_Speed_KMH",
-      "Battery_Percent",
-      "Pitch_Deg",
-      "Roll_Deg",
-      "Yaw_Deg",
-      "Position_X",
-      "Position_Y",
-      "Position_Z",
-      "Motor_1_Throttle_Pct",
-      "Motor_2_Throttle_Pct",
-      "Motor_3_Throttle_Pct",
-      "Motor_4_Throttle_Pct",
-      "Flight_Mode",
-    ];
-
-    const dataRows = (frames.length > 0 ? frames : []).map((f) => [
-      f.timeSeconds.toFixed(2),
-      f.altitudeAgl.toFixed(2),
-      f.groundSpeedKmh.toFixed(2),
-      f.batteryLevel.toFixed(1),
-      ((f.rotation?.pitch || 0) * (180 / Math.PI)).toFixed(2),
-      ((f.rotation?.roll || 0) * (180 / Math.PI)).toFixed(2),
-      ((f.rotation?.yaw || 0) * (180 / Math.PI)).toFixed(2),
-      f.position.x.toFixed(2),
-      f.position.y.toFixed(2),
-      f.position.z.toFixed(2),
-      ((f.motorOutputs?.[0] || 0) * 100).toFixed(1),
-      ((f.motorOutputs?.[1] || 0) * 100).toFixed(1),
-      ((f.motorOutputs?.[2] || 0) * 100).toFixed(1),
-      ((f.motorOutputs?.[3] || 0) * 100).toFixed(1),
-      f.flightMode || "MANUAL",
-    ]);
+    const dataRows = (frames.length > 0 ? frames : []).map(formatFrameToCSVRow);
 
     const csvContent =
       "data:text/csv;charset=utf-8," +
-      [headers.join(","), ...dataRows.map((r) => r.join(","))].join("\n");
+      [TELEMETRY_CSV_HEADERS.join(","), ...dataRows.map((r) => r.join(","))].join("\n");
 
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement("a");
     link.setAttribute("href", encodedUri);
+    const runId = frames.length > 0 && frames[0].flightRunId ? `_${frames[0].flightRunId}` : "";
     link.setAttribute(
       "download",
-      `DronePilot_Blackbox_${drone.name.replace(/\s+/g, "_")}_${Date.now()}.csv`
+      `DronePilot_Blackbox_${drone.name.replace(/\s+/g, "_")}${runId}_${Date.now()}.csv`
+    );
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  // Export Structured JSON Run Log & Metadata
+  const handleExportJSON = () => {
+    const runId =
+      frames.length > 0 && frames[0].flightRunId
+        ? frames[0].flightRunId
+        : `run_${Date.now().toString(36)}`;
+
+    const payload = {
+      metadata: {
+        flightRunId: runId,
+        droneName: drone.name,
+        airframeType: drone.platformId,
+        callsign,
+        startTimeIso:
+          frames.length > 0 && frames[0].timestampIso
+            ? frames[0].timestampIso
+            : new Date().toISOString(),
+        durationSeconds: telemetry.flightTimeSeconds,
+        frameCount: frames.length,
+        sampleRateHz: 20,
+        coordinateSystem: "Three.js (Y-up, X-east, Z-south)",
+      },
+      summary: {
+        maxAltitudeMeters: Math.round(stats.maxAltitude * 10) / 10,
+        maxSpeedKmh: Math.round(stats.topSpeed * 10) / 10,
+        distanceTraveledMeters: Math.round(stats.distance * 10) / 10,
+        batteryConsumedPercent: Math.round(Math.max(0, 100 - telemetry.batteryLevel) * 10) / 10,
+      },
+      frames,
+    };
+
+    const jsonStr =
+      "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(payload, null, 2));
+    const link = document.createElement("a");
+    link.setAttribute("href", jsonStr);
+    link.setAttribute(
+      "download",
+      `DronePilot_FlightRun_${drone.name.replace(/\s+/g, "_")}_${runId}.json`
     );
     document.body.appendChild(link);
     link.click();
@@ -270,9 +283,16 @@ export function PostFlightReportModal({
             <button
               onClick={handleExportCSV}
               className="flex items-center gap-2 px-3.5 py-2 rounded-lg bg-neutral-100 hover:bg-neutral-200 text-neutral-800 font-bold text-xs uppercase tracking-wider transition-colors border border-neutral-300 shadow-xs cursor-pointer"
-              title="Download Telemetry Blackbox CSV"
+              title="Download Standardized Telemetry Blackbox CSV"
             >
               <FileSpreadsheet className="w-4 h-4 text-emerald-600" /> Export CSV Log
+            </button>
+            <button
+              onClick={handleExportJSON}
+              className="flex items-center gap-2 px-3.5 py-2 rounded-lg bg-neutral-100 hover:bg-neutral-200 text-neutral-800 font-bold text-xs uppercase tracking-wider transition-colors border border-neutral-300 shadow-xs cursor-pointer"
+              title="Download Full Flight Run Telemetry JSON"
+            >
+              <FileJson className="w-4 h-4 text-sky-600" /> Export JSON
             </button>
             <button
               onClick={() => window.print()}
