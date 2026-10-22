@@ -131,11 +131,16 @@ function runTests() {
   // --------------------------------------------------------
   // 8. Simulator Adapter Fidelity
   // --------------------------------------------------------
+  // Note: def.mass represents Operating Empty Mass (dry airframe + battery mass)
+  // because FlightPhysicsEngine computes totalMass = def.mass + payloadMass.
   const def = digitalTwinToDroneDefinition(TRAINING_QUADCOPTER_PRESET);
+  const expectedOperatingEmptyMass =
+    TRAINING_QUADCOPTER_PRESET.massProperties.dryMassKg +
+    TRAINING_QUADCOPTER_PRESET.massProperties.batteryMassKg;
   assert(
     def.motorCount === 4 &&
       def.motors.length === 4 &&
-      def.mass === TRAINING_QUADCOPTER_PRESET.massProperties.dryMassKg &&
+      Math.abs(def.mass - expectedOperatingEmptyMass) < 1e-6 &&
       def.maximumThrust === TRAINING_QUADCOPTER_PRESET.performance.totalThrustNewtons,
     "Simulator adapter converts Digital Twin to valid DroneDefinition"
   );

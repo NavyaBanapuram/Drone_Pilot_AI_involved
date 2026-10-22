@@ -37,6 +37,7 @@ export function digitalTwinToDroneDefinition(
     id: dt.identity.id,
     name: dt.identity.name,
     type: dt.identity.category,
+    // Operating Empty Mass: bare airframe + battery mass (flight physics computes totalMass = def.mass + payloadMass)
     mass: dt.massProperties.dryMassKg + dt.massProperties.batteryMassKg,
     motorCount,
     motors,
