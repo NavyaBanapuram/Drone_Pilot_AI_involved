@@ -1,0 +1,93 @@
+{
+  "datasetName": "DronePilot-Precision-Landing-Dataset",
+  "version": "1.0.0",
+  "createdIso": "2026-10-22T09:58:35.948Z",
+  "totalSamples": 50,
+  "totalFlightRuns": 10,
+  "splits": {
+    "train": {
+      "flightRunIds": [
+        "run_synth_4242_0008",
+        "run_synth_4242_0000",
+        "run_synth_4242_0006",
+        "run_synth_4242_0009",
+        "run_synth_4242_0001",
+        "run_synth_4242_0004",
+        "run_synth_4242_0003"
+      ],
+      "sampleIds": [
+        "sample_run_synth_4242_0000_0000",
+        "sample_run_synth_4242_0000_0001",
+        "sample_run_synth_4242_0000_0002",
+        "sample_run_synth_4242_0000_0003",
+        "sample_run_synth_4242_0000_0004",
+        "sample_run_synth_4242_0001_0000",
+        "sample_run_synth_4242_0001_0001",
+        "sample_run_synth_4242_0001_0002",
+        "sample_run_synth_4242_0001_0003",
+        "sample_run_synth_4242_0001_0004",
+        "sample_run_synth_4242_0003_0000",
+        "sample_run_synth_4242_0003_0001",
+        "sample_run_synth_4242_0003_0002",
+        "sample_run_synth_4242_0003_0003",
+        "sample_run_synth_4242_0003_0004",
+        "sample_run_synth_4242_0004_0000",
+        "sample_run_synth_4242_0004_0001",
+        "sample_run_synth_4242_0004_0002",
+        "sample_run_synth_4242_0004_0003",
+        "sample_run_synth_4242_0004_0004",
+        "sample_run_synth_4242_0006_0000",
+        "sample_run_synth_4242_0006_0001",
+        "sample_run_synth_4242_0006_0002",
+        "sample_run_synth_4242_0006_0003",
+        "sample_run_synth_4242_0006_0004",
+        "sample_run_synth_4242_0008_0000",
+        "sample_run_synth_4242_0008_0001",
+        "sample_run_synth_4242_0008_0002",
+        "sample_run_synth_4242_0008_0003",
+        "sample_run_synth_4242_0008_0004",
+        "sample_run_synth_4242_0009_0000",
+        "sample_run_synth_4242_0009_0001",
+        "sample_run_synth_4242_0009_0002",
+        "sample_run_synth_4242_0009_0003",
+        "sample_run_synth_4242_0009_0004"
+      ],
+      "sampleCount": 35,
+      "percentage": 70
+    },
+    "val": {
+      "flightRunIds": [
+        "run_synth_4242_0007",
+        "run_synth_4242_0002"
+      ],
+      "sampleIds": [
+        "sample_run_synth_4242_0002_0000",
+        "sample_run_synth_4242_0002_0001",
+        "sample_run_synth_4242_0002_0002",
+        "sample_run_synth_4242_0002_0003",
+        "sample_run_synth_4242_0002_0004",
+        "sample_run_synth_4242_0007_0000",
+        "sample_run_synth_4242_0007_0001",
+        "sample_run_synth_4242_0007_0002",
+        "sample_run_synth_4242_0007_0003",
+        "sample_run_synth_4242_0007_0004"
+      ],
+      "sampleCount": 10,
+      "percentage": 20
+    },
+    "test": {
+      "flightRunIds": [
+        "run_synth_4242_0005"
+      ],
+      "sampleIds": [
+        "sample_run_synth_4242_0005_0000",
+        "sample_run_synth_4242_0005_0001",
+        "sample_run_synth_4242_0005_0002",
+        "sample_run_synth_4242_0005_0003",
+        "sample_run_synth_4242_0005_0004"
+      ],
+      "sampleCount": 5,
+      "percentage": 10
+    }
+  }
+}
