@@ -1,0 +1,22 @@
+{
+  "name": "Drone Pilot",
+  "short_name": "Drone Pilot",
+  "description": "Interactive 3D drone simulation and telemetry platform.",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "landscape",
+  "background_color": "#ffffff",
+  "theme_color": "#FF5500",
+  "icons": [
+    {
+      "src": "/drone-icon.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/drone-icon.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

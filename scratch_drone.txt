@@ -1,0 +1,289 @@
+    const buildDrone = (platformType: string) => {
+      const droneGroup = new THREE.Group();
+      propellers.length = 0; // reset
+
+      const rotors = platformType === "quadcopter" ? 4 : platformType === "hexacopter" ? 6 : 8;
+      const armLength = platformType === "quadcopter" ? 0.35 : platformType === "hexacopter" ? 0.55 : 0.75;
+      const bodyScale = platformType === "quadcopter" ? 1.0 : platformType === "hexacopter" ? 1.4 : 1.8;
+
+      // ----------------------------------------------
+      // 1. ADVANCED AERODYNAMIC FUSELAGE
+      // ----------------------------------------------
+      const bodyGroup = new THREE.Group();
+      droneGroup.add(bodyGroup);
+
+      if (platformType === "quadcopter") {
+        // Quadcopter: Sleek engineered shell
+        // Main structural core (graphite)
+        const core = createBox(0.18, 0.05, 0.24, satinBlack);
+        bodyGroup.add(core);
+
+        // Upper aerodynamic shell (silver)
+        const topShellGeo = new THREE.CylinderGeometry(0.08, 0.08, 0.22, 24);
+        topShellGeo.rotateZ(Math.PI / 2);
+        topShellGeo.scale(1, 0.4, 1);
+        const topShell = new THREE.Mesh(topShellGeo, silverAlloy);
+        topShell.position.set(0, 0.035, 0);
+        topShell.castShadow = true;
+        bodyGroup.add(topShell);
+        
+        // Lower belly shell
+        const bottomShellGeo = new THREE.CylinderGeometry(0.06, 0.06, 0.2, 24);
+        bottomShellGeo.rotateZ(Math.PI / 2);
+        bottomShellGeo.scale(1, 0.5, 1);
+        const bottomShell = new THREE.Mesh(bottomShellGeo, matteComposite);
+        bottomShell.position.set(0, -0.03, 0);
+        bottomShell.castShadow = true;
+        bodyGroup.add(bottomShell);
+
+        // Side cooling vents
+        const ventLeft = createBox(0.12, 0.02, 0.1, machinedAlloy);
+        ventLeft.position.set(0, 0, 0.08);
+        bodyGroup.add(ventLeft);
+        
+        const ventRight = createBox(0.12, 0.02, 0.1);
+        ventRight.material = machinedAlloy;
+        ventRight.position.set(0, 0, -0.08);
+        bodyGroup.add(ventRight);
+        
+      } else if (platformType === "hexacopter") {
+        // Hexacopter: Multi-layered central hub
+        const upperDeck = createCylinder(0.16, 0.18, 0.04, 12, silverAlloy);
+        upperDeck.position.set(0, 0.05, 0);
+        upperDeck.castShadow = true;
+        bodyGroup.add(upperDeck);
+
+        const midDeck = createCylinder(0.17, 0.17, 0.06, 12, satinBlack);
+        midDeck.position.set(0, 0, 0);
+        bodyGroup.add(midDeck);
+
+        const lowerDeck = createCylinder(0.15, 0.14, 0.05, 12, matteComposite);
+        lowerDeck.position.set(0, -0.05, 0);
+        lowerDeck.castShadow = true;
+        bodyGroup.add(lowerDeck);
+        
+        // Electronics dome
+        const domeGeo = new THREE.SphereGeometry(0.1, 16, 16, 0, Math.PI * 2, 0, Math.PI / 2);
+        domeGeo.scale(1, 0.5, 1);
+        const dome = new THREE.Mesh(domeGeo, silverAlloy);
+        dome.position.set(0, 0.07, 0);
+        bodyGroup.add(dome);
+
+      } else {
+        // Octacopter: Heavy industrial folded-metal look
+        const upperDeckGeo = new THREE.CylinderGeometry(0.24, 0.22, 0.06, 8);
+        const upperDeck = new THREE.Mesh(upperDeckGeo, silverAlloy);
+        upperDeck.position.set(0, 0.06, 0);
+        upperDeck.castShadow = true;
+        bodyGroup.add(upperDeck);
+
+        const lowerDeckGeo = new THREE.CylinderGeometry(0.21, 0.24, 0.08, 8);
+        const lowerDeck = new THREE.Mesh(lowerDeckGeo, satinBlack);
+        lowerDeck.position.set(0, -0.01, 0);
+        lowerDeck.castShadow = true;
+        bodyGroup.add(lowerDeck);
+        
+        // Heat sinks / avionics ridges
+        for(let i=0; i<4; i++) {
+          const ridge = createBox(0.35, 0.02, 0.05, machinedAlloy);
+          ridge.rotation.y = (Math.PI / 4) * i;
+          ridge.position.set(0, 0.09, 0);
+          bodyGroup.add(ridge);
+        }
+      }
+
+      // Battery Bay (Rear)
+      const batW = 0.12 * bodyScale, batH = 0.08 * bodyScale, batD = 0.16 * bodyScale;
+      const batteryGroup = new THREE.Group();
+      batteryGroup.position.set(0, 0, -0.15 * bodyScale);
+      
+      const batBody = createBox(batW, batH, batD, matteComposite);
+      batteryGroup.add(batBody);
+      
+      const batCap = createBox(batW * 0.9, batH * 0.9, 0.02, satinBlack);
+      batCap.position.set(0, 0, batD / 2 + 0.01);
+      batteryGroup.add(batCap);
+      
+      const batRelease = createBox(batW * 0.5, 0.01, 0.03, neonOrange);
+      batRelease.position.set(0, batH / 2 + 0.005, batD / 2 - 0.02);
+      batteryGroup.add(batRelease);
+      
+      bodyGroup.add(batteryGroup);
+
+      // GPS / RTK Antenna (Top)
+      const gpsGroup = new THREE.Group();
+      gpsGroup.position.set(0, 0.1 * bodyScale, -0.05);
+      
+      const gpsMast = createCylinder(0.006, 0.006, 0.08, 8, satinBlack);
+      gpsMast.position.set(0, 0.04, 0);
+      gpsGroup.add(gpsMast);
+      
+      const gpsPuckGeo = new THREE.CylinderGeometry(0.035, 0.035, 0.015, 16);
+      gpsPuckGeo.translate(0, 0.08, 0);
+      const gpsPuck = new THREE.Mesh(gpsPuckGeo, silverAlloy);
+      gpsGroup.add(gpsPuck);
+      
+      const gpsLight = createCylinder(0.032, 0.032, 0.005, 16, neonOrange);
+      gpsLight.position.set(0, 0.09, 0);
+      gpsGroup.add(gpsLight);
+      
+      bodyGroup.add(gpsGroup);
+
+      // Camera / Sensor Module (Front)
+      const gimbalGroup = new THREE.Group();
+      gimbalGroup.position.set(0, -0.06 * bodyScale, 0.12 * bodyScale);
+      
+      const gimbalMount = createBox(0.06, 0.02, 0.06, satinBlack);
+      gimbalGroup.add(gimbalMount);
+      
+      const gimbalArm = createBox(0.015, 0.06, 0.02, machinedAlloy);
+      gimbalArm.position.set(0.03, -0.03, 0);
+      gimbalGroup.add(gimbalArm);
+
+      const cameraHousing = createCylinder(0.03, 0.03, 0.05, 16, machinedAlloy);
+      cameraHousing.rotation.z = Math.PI / 2;
+      cameraHousing.position.set(0, -0.05, 0.02);
+      gimbalGroup.add(cameraHousing);
+
+      const cameraLens = createCylinder(0.02, 0.02, 0.01, 16, glassMat);
+      cameraLens.rotation.x = Math.PI / 2;
+      cameraLens.position.set(0, -0.05, 0.045);
+      gimbalGroup.add(cameraLens);
+      
+      bodyGroup.add(gimbalGroup);
+
+      // ----------------------------------------------
+      // 2. STRUCTURAL ARMS & MOTOR PODS
+      // ----------------------------------------------
+      for (let i = 0; i < rotors; i++) {
+        const angle = (i * Math.PI * 2) / rotors + (platformType === "quadcopter" ? Math.PI / 4 : (platformType === "hexacopter" ? Math.PI / 6 : Math.PI / 8));
+        const armGroup = new THREE.Group();
+        armGroup.rotation.y = angle;
+
+        // Root Joint / Hinge (Industrial mechanism)
+        const rootJoint = createCylinder(0.03, 0.03, 0.06, 12, satinBlack);
+        rootJoint.rotation.x = Math.PI / 2;
+        rootJoint.position.set(0.12 * bodyScale, 0, 0);
+        armGroup.add(rootJoint);
+
+        // Carbon Fiber Arm (Tubular for industrial look)
+        const armRadius = platformType === "quadcopter" ? 0.012 : 0.018;
+        const armGeo = new THREE.CylinderGeometry(armRadius, armRadius, armLength, 12);
+        armGeo.rotateZ(Math.PI / 2);
+        const armMesh = new THREE.Mesh(armGeo, matteComposite);
+        armMesh.position.set(0.12 * bodyScale + armLength / 2, 0, 0);
+        armMesh.castShadow = true;
+        armGroup.add(armMesh);
+        
+        // Arm locking collar
+        const collar = createCylinder(armRadius * 1.3, armRadius * 1.3, 0.03, 12, neonOrange);
+        collar.rotation.z = Math.PI / 2;
+        collar.position.set(0.12 * bodyScale + 0.04, 0, 0);
+        armGroup.add(collar);
+
+        const motorCenter = 0.12 * bodyScale + armLength;
+
+        // Motor Mounting Bracket
+        const mountBracket = createBox(0.06, 0.015, 0.05, machinedAlloy);
+        mountBracket.position.set(motorCenter, 0, 0);
+        armGroup.add(mountBracket);
+        
+        const mountClamp = createBox(0.03, 0.03, 0.03, satinBlack);
+        mountClamp.position.set(motorCenter - 0.01, 0, 0);
+        armGroup.add(mountClamp);
+
+        // Motor Base / Stator
+        const motorStator = createCylinder(0.035, 0.035, 0.02, 24, satinBlack);
+        motorStator.position.set(motorCenter, 0.015, 0);
+        armGroup.add(motorStator);
+
+        // Motor Bell (Rotor)
+        const motorBell = createCylinder(0.034, 0.034, 0.025, 24, silverAlloy);
+        motorBell.position.set(motorCenter, 0.04, 0);
+        armGroup.add(motorBell);
+        
+        // Motor Ventilation accents
+        const ventRing = createCylinder(0.0345, 0.0345, 0.005, 24, satinBlack);
+        ventRing.position.set(motorCenter, 0.045, 0);
+        armGroup.add(ventRing);
+        
+        // Motor Shaft
+        const motorShaft = createCylinder(0.005, 0.005, 0.02, 8, machinedAlloy);
+        motorShaft.position.set(motorCenter, 0.06, 0);
+        armGroup.add(motorShaft);
+
+        // ----------------------------------------------
+        // 3. PROPELLERS
+        // ----------------------------------------------
+        const propGroup = new THREE.Group();
+        propGroup.position.set(motorCenter, 0.065, 0);
+        
+        const propHub = createCylinder(0.012, 0.012, 0.012, 16, satinBlack);
+        propGroup.add(propHub);
+        
+        const hubCap = createCylinder(0.008, 0.008, 0.003, 16, neonOrange);
+        hubCap.position.set(0, 0.006, 0);
+        propGroup.add(hubCap);
+
+        // Realistic 2-blade Propeller
+        const bladeRadius = platformType === "quadcopter" ? 0.22 : platformType === "hexacopter" ? 0.28 : 0.34;
+        
+        // Create an aerodynamic blade shape
+        const bladeShape = new THREE.Shape();
+        bladeShape.moveTo(0, 0.008);
+        bladeShape.quadraticCurveTo(bladeRadius * 0.3, 0.025, bladeRadius, 0.003);
+        bladeShape.lineTo(bladeRadius, -0.003);
+        bladeShape.quadraticCurveTo(bladeRadius * 0.3, -0.015, 0, -0.008);
+        
+        const extrudeSettings = { depth: 0.002, bevelEnabled: true, bevelSegments: 2, steps: 1, bevelSize: 0.001, bevelThickness: 0.001 };
+        const bladeGeo = new THREE.ExtrudeGeometry(bladeShape, extrudeSettings);
+        bladeGeo.center();
+        
+        const blade1 = new THREE.Mesh(bladeGeo, propellerMat);
+        blade1.position.set(bladeRadius / 2, 0, 0);
+        blade1.rotation.x = 0.15; // Pitch
+        blade1.castShadow = true;
+        propGroup.add(blade1);
+        
+        const blade2 = new THREE.Mesh(bladeGeo, propellerMat);
+        blade2.position.set(-bladeRadius / 2, 0, 0);
+        blade2.rotation.z = Math.PI;
+        blade2.rotation.x = 0.15;
+        blade2.castShadow = true;
+        propGroup.add(blade2);
+        
+        armGroup.add(propGroup);
+        propellers.push({ group: propGroup, direction: i % 2 === 0 ? 1 : -1 });
+
+        // ----------------------------------------------
+        // 4. LANDING GEAR
+        // ----------------------------------------------
+        // Add landing gear based on type
+        const needsGear = platformType === "quadcopter" ? true : (platformType === "hexacopter" ? i % 3 === 0 : i % 2 === 0);
+        if (needsGear) {
+          const gearGroup = new THREE.Group();
+          gearGroup.position.set(0.12 * bodyScale + armLength * 0.3, 0, 0);
+          
+          const strutHeight = platformType === "quadcopter" ? 0.18 : 0.25;
+          const strut = createCylinder(0.008, 0.006, strutHeight, 8, matteComposite);
+          strut.rotation.z = -0.15; 
+          strut.position.set(0, -strutHeight / 2, 0);
+          strut.castShadow = true;
+          gearGroup.add(strut);
+
+          // T-shaped structural skid
+          const skidLen = platformType === "quadcopter" ? 0.22 : 0.35;
+          const skid = createCylinder(0.01, 0.01, skidLen, 8, satinBlack);
+          skid.rotation.x = Math.PI / 2;
+          skid.position.set(strutHeight * Math.sin(0.15), -strutHeight, 0);
+          skid.castShadow = true;
+          gearGroup.add(skid);
+          
+          armGroup.add(gearGroup);
+        }
+
+        droneGroup.add(armGroup);
+      }
+
+      return droneGroup;
+    };

@@ -1,0 +1,66 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    // 1. User Profiles & Private Data Isolation
+    match /users/{userId} {
+      allow read, write: if isOwner(userId);
+
+      // Private Drone Digital Twin Configurations (Strict user isolation)
+      match /aircraftConfigurations/{configId} {
+        allow read, write: if isOwner(userId);
+      }
+
+      // Private Flight Training Sessions & Debrief History
+      match /sessions/{sessionId} {
+        allow read, write: if isOwner(userId);
+      }
+
+      // Flight Recorder Telemetry Logs
+      match /flightHistory/{historyId} {
+        allow read, write: if isOwner(userId);
+      }
+    }
+
+    // 2. Active Airspace (Multiplayer Synchronization)
+    match /active_airspace/{playerId} {
+      // Any authenticated or guest pilot can observe active airspace
+      allow read: if true;
+
+      // Pilots can create, update, or remove their own active telemetry record
+      allow create, update: if (
+        request.resource.data.position.y >= 0 &&
+        request.resource.data.position.y <= 2000 &&
+        request.resource.data.playerId == playerId
+      );
+
+      allow delete: if true;
+    }
+
+    // 3. Shared Collaborative Simulation Sessions (Instructor / Student)
+    match /simulation_sessions/{sessionId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated() && request.resource.data.ownerId == request.auth.uid;
+      allow update: if isAuthenticated() && (
+        resource.data.ownerId == request.auth.uid ||
+        request.auth.uid in resource.data.participants
+      );
+      allow delete: if isAuthenticated() && resource.data.ownerId == request.auth.uid;
+    }
+
+    // Default deny all other paths
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
