@@ -149,6 +149,32 @@ const FPVStaticOverlay = ({ distance }: { distance: number }) => {
   );
 };
 
+/**
+ * Defensive scene-graph validator to sanitize undefined children and missing materials.
+ * Separated from the hot per-frame render loop and executed on startup + throttled interval.
+ */
+function sanitizeSceneGraph(scene: THREE.Object3D) {
+  scene.traverse((obj: any) => {
+    if (obj.children && obj.children.includes(undefined as any)) {
+      console.error("CORRUPTED THREE.JS OBJECT FOUND (undefined child):", obj, obj.name, obj.type);
+      obj.children = obj.children.filter((c: any) => c !== undefined);
+    }
+    if (obj.isMesh || obj.isPoints || obj.isLine || obj.isSprite) {
+      if (!obj.material) {
+        console.error("OBJECT MISSING MATERIAL:", obj, obj.name);
+        obj.material = new THREE.MeshBasicMaterial({ color: 0xff00ff });
+      } else if (Array.isArray(obj.material)) {
+        for (let i = 0; i < obj.material.length; i++) {
+          if (!obj.material[i]) {
+            console.error("OBJECT MATERIAL ARRAY MISSING ITEM AT INDEX", i, obj, obj.name);
+            obj.material[i] = new THREE.MeshBasicMaterial({ color: 0xff00ff });
+          }
+        }
+      }
+    }
+  });
+}
+
 export function FlightSimulator({ selectedDrone, initialDigitalTwin, onExit }: FlightSimulatorProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const inputManagerRef = useRef<InputManager | null>(null);
@@ -1054,6 +1080,10 @@ export function FlightSimulator({ selectedDrone, initialDigitalTwin, onExit }: F
     let telemetryThrottleTimer = 0; let coachEvalTimer = 0;
     let framesCount = 0;
     let fpsTimer = 0;
+    let sceneSanitizeTimer = 0;
+
+    // Initial scene integrity pass after scene assembly
+    sanitizeSceneGraph(scene);
 
     const animate = () => {
       animationId = requestAnimationFrame(animate);
@@ -1216,26 +1246,12 @@ export function FlightSimulator({ selectedDrone, initialDigitalTwin, onExit }: F
         physics.environment.getState()
       );
 
-      // Render 3D Frame
-      scene.traverse((obj: any) => {
-        if (obj.children && obj.children.includes(undefined as any)) {
-          console.error("CORRUPTED THREE.JS OBJECT FOUND (undefined child):", obj, obj.name, obj.type);
-          obj.children = obj.children.filter((c: any) => c !== undefined);
-        }
-        if (obj.isMesh || obj.isPoints || obj.isLine || obj.isSprite) {
-          if (!obj.material) {
-            console.error("OBJECT MISSING MATERIAL:", obj, obj.name);
-            obj.material = new THREE.MeshBasicMaterial({ color: 0xff00ff });
-          } else if (Array.isArray(obj.material)) {
-            for (let i = 0; i < obj.material.length; i++) {
-              if (!obj.material[i]) {
-                console.error("OBJECT MATERIAL ARRAY MISSING ITEM AT INDEX", i, obj, obj.name);
-                obj.material[i] = new THREE.MeshBasicMaterial({ color: 0xff00ff });
-              }
-            }
-          }
-        }
-      });
+      // Sanitize 3D Scene Graph on throttled interval (0.5Hz) to preserve defensive integrity without 60fps traversal overhead
+      sceneSanitizeTimer += dt;
+      if (sceneSanitizeTimer >= 2.0) {
+        sceneSanitizeTimer = 0;
+        sanitizeSceneGraph(scene);
+      }
       renderer.render(scene, chaseCam.camera);
 
       // Broadcast telemetry to peer pilots
