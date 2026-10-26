@@ -1,0 +1,168 @@
+{
+  "timestampIso": "2026-10-23T05:15:11.557Z",
+  "modelPath": "/models/precision_landing_resnext50.onnx",
+  "sampleCount": 30,
+  "modelLoadSuccess": true,
+  "latency": {
+    "minMs": 578,
+    "maxMs": 764,
+    "meanMs": 679.2,
+    "medianMs": 692,
+    "p95Ms": 758.7
+  },
+  "safety": {
+    "allAssistanceDisabled": true,
+    "allCommandsZero": true,
+    "allFSMStatesDisabled": true,
+    "allOutputsFinite": true,
+    "invalidCount": 0
+  },
+  "sampleSnapshot": [
+    {
+      "sampleIndex": 1,
+      "status": "DETECTED",
+      "confidence": 0.955,
+      "isDetected": true,
+      "center": {
+        "u": 0.49245765805244446,
+        "v": 0.4584271013736725,
+        "pixelX": 110.3,
+        "pixelY": 102.7
+      },
+      "bbox": {
+        "xMin": 0.17343321442604065,
+        "yMin": 0.13637879490852356,
+        "xMax": 0.79449462890625,
+        "yMax": 0.7677552700042725
+      },
+      "predictedScene": "Building",
+      "sceneConfidence": 0.51,
+      "latencyMs": 739,
+      "timestampMs": 1792732490437,
+      "isAssistEnabled": false,
+      "assistState": "DISABLED",
+      "lastCommand": {
+        "pitch": 0,
+        "roll": 0,
+        "throttle": 0
+      }
+    },
+    {
+      "sampleIndex": 2,
+      "status": "DETECTED",
+      "confidence": 0.955,
+      "isDetected": true,
+      "center": {
+        "u": 0.49245765805244446,
+        "v": 0.4584271013736725,
+        "pixelX": 110.3,
+        "pixelY": 102.7
+      },
+      "bbox": {
+        "xMin": 0.17343321442604065,
+        "yMin": 0.13637879490852356,
+        "xMax": 0.79449462890625,
+        "yMax": 0.7677552700042725
+      },
+      "predictedScene": "Building",
+      "sceneConfidence": 0.51,
+      "latencyMs": 698,
+      "timestampMs": 1792732491379,
+      "isAssistEnabled": false,
+      "assistState": "DISABLED",
+      "lastCommand": {
+        "pitch": 0,
+        "roll": 0,
+        "throttle": 0
+      }
+    },
+    {
+      "sampleIndex": 3,
+      "status": "DETECTED",
+      "confidence": 0.955,
+      "isDetected": true,
+      "center": {
+        "u": 0.49245741963386536,
+        "v": 0.4584270715713501,
+        "pixelX": 110.3,
+        "pixelY": 102.7
+      },
+      "bbox": {
+        "xMin": 0.1734330654144287,
+        "yMin": 0.13637873530387878,
+        "xMax": 0.7944944500923157,
+        "yMax": 0.7677552700042725
+      },
+      "predictedScene": "Building",
+      "sceneConfidence": 0.51,
+      "latencyMs": 713,
+      "timestampMs": 1792732492196,
+      "isAssistEnabled": false,
+      "assistState": "DISABLED",
+      "lastCommand": {
+        "pitch": 0,
+        "roll": 0,
+        "throttle": 0
+      }
+    },
+    {
+      "sampleIndex": 4,
+      "status": "DETECTED",
+      "confidence": 0.955,
+      "isDetected": true,
+      "center": {
+        "u": 0.49245765805244446,
+        "v": 0.4584271013736725,
+        "pixelX": 110.3,
+        "pixelY": 102.7
+      },
+      "bbox": {
+        "xMin": 0.17343321442604065,
+        "yMin": 0.13637879490852356,
+        "xMax": 0.79449462890625,
+        "yMax": 0.7677552700042725
+      },
+      "predictedScene": "Building",
+      "sceneConfidence": 0.51,
+      "latencyMs": 764,
+      "timestampMs": 1792732493232,
+      "isAssistEnabled": false,
+      "assistState": "DISABLED",
+      "lastCommand": {
+        "pitch": 0,
+        "roll": 0,
+        "throttle": 0
+      }
+    },
+    {
+      "sampleIndex": 5,
+      "status": "DETECTED",
+      "confidence": 0.955,
+      "isDetected": true,
+      "center": {
+        "u": 0.4924575388431549,
+        "v": 0.4584270119667053,
+        "pixelX": 110.3,
+        "pixelY": 102.7
+      },
+      "bbox": {
+        "xMin": 0.17343324422836304,
+        "yMin": 0.13637888431549072,
+        "xMax": 0.7944943904876709,
+        "yMax": 0.7677550315856934
+      },
+      "predictedScene": "Building",
+      "sceneConfidence": 0.51,
+      "latencyMs": 654,
+      "timestampMs": 1792732493892,
+      "isAssistEnabled": false,
+      "assistState": "DISABLED",
+      "lastCommand": {
+        "pitch": 0,
+        "roll": 0,
+        "throttle": 0
+      }
+    }
+  ],
+  "consoleErrors": []
+}

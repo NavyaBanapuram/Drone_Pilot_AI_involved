@@ -46,6 +46,9 @@ import { DroneAudio } from "@/lib/audio/drone-audio";
 import { WindAudio } from "@/lib/audio/wind-audio";
 import { EnvironmentZoneAudio } from "@/lib/audio/environment-zones";
 import { SFXEvents } from "@/lib/audio/sfx-events";
+import { BrowserInferenceEngine, VisionDetectionResult } from "@/lib/vision/browser-inference";
+import { LandingAssistController, LandingAssistStatus } from "@/lib/vision/landing-assist-fsm";
+import { VisionLandingOverlay } from "./vision/vision-landing-overlay";
 import { REGION_LIST } from "@/lib/world/region-definitions";
 import {
   DroneDigitalTwinConfiguration,
@@ -314,6 +317,42 @@ export function FlightSimulator({ selectedDrone, initialDigitalTwin, onExit }: F
   const [replayFrames, setReplayFrames] = useState<ReplayFrame[]>([]);
   const [analysisReport, setAnalysisReport] = useState<FlightAnalysisReport | null>(null);
   const [physicsDebug, setPhysicsDebug] = useState<PhysicsDebugTelemetry | null>(null);
+
+  // Phase E: Vision & Precision Landing Assist State
+  const inferenceEngineRef = useRef<BrowserInferenceEngine | null>(null);
+  const landingAssistControllerRef = useRef<LandingAssistController>(new LandingAssistController());
+  const [isLandingAssistEnabled, setIsLandingAssistEnabled] = useState(false);
+  const isLandingAssistEnabledRef = useRef(false);
+  const [visionDetection, setVisionDetection] = useState<VisionDetectionResult>({
+    status: "IDLE",
+    confidence: 0,
+    isDetected: false,
+    center: { u: 0.5, v: 0.5, pixelX: 112, pixelY: 112 },
+    bbox: { xMin: 0.35, yMin: 0.35, xMax: 0.65, yMax: 0.65 },
+    predictedScene: "Field",
+    sceneConfidence: 0,
+    latencyMs: 0,
+    timestampMs: 0,
+  });
+  const [landingAssistStatus, setLandingAssistStatus] = useState<LandingAssistStatus>({
+    state: "DISABLED",
+    isActive: false,
+    confidence: 0,
+    centerErrorNorm: { du: 0, dv: 0 },
+    targetLossTimerSeconds: 0,
+    altitudeAglMeters: 1.445,
+    lastCommand: { pitch: 0, roll: 0, throttle: 0 },
+    abortReason: null,
+  });
+
+  const handleToggleLandingAssist = useCallback(() => {
+    setIsLandingAssistEnabled((prev) => {
+      const next = !prev;
+      isLandingAssistEnabledRef.current = next;
+      landingAssistControllerRef.current.setEnabled(next);
+      return next;
+    });
+  }, []);
 
   // Environment State
   const [envState, setEnvState] = useState<EnvironmentState>({
@@ -1073,6 +1112,9 @@ export function FlightSimulator({ selectedDrone, initialDigitalTwin, onExit }: F
       if (e.code === "KeyR") {
         physics.triggerRTL();
       }
+      if (e.code === "KeyK") {
+        handleToggleLandingAssist();
+      }
     };
 
     const onWheel = (e: WheelEvent) => {
@@ -1087,6 +1129,12 @@ export function FlightSimulator({ selectedDrone, initialDigitalTwin, onExit }: F
     domEl.addEventListener("dblclick", onDblClick);
     domEl.addEventListener("wheel", onWheel, { passive: false });
     window.addEventListener("keydown", onGlobalKeyDown);
+
+    // Initialize Phase E Vision Inference Engine
+    const visionEngine = new BrowserInferenceEngine(100);
+    inferenceEngineRef.current = visionEngine;
+    visionEngine.initOffscreenRenderer();
+    visionEngine.loadModel("/models/precision_landing_resnext50.onnx");
 
     // 12. ANIMATION & SIMULATION LOOP
     let animationId: number;
@@ -1135,8 +1183,47 @@ export function FlightSimulator({ selectedDrone, initialDigitalTwin, onExit }: F
         setCameraMode(chaseCam.cycleMode());
       }
 
-      // Step Physics via Canonical Simulation Clock (Fixed-Timestep Accumulator)
+      // Generate baseline telemetry for state estimation
       let curTelemetry = physics.generateTelemetry();
+
+      // Phase E: Vision Inference & Guarded Landing Assist Integration
+      if (inferenceEngineRef.current) {
+        const detection = inferenceEngineRef.current.processFrame(
+          scene,
+          { x: physics.posX, y: physics.posY, z: physics.posZ },
+          {
+            pitchDeg: physics.pitch * (180 / Math.PI),
+            rollDeg: physics.roll * (180 / Math.PI),
+            yawDeg: physics.yaw * (180 / Math.PI),
+          }
+        );
+
+        const assistedInput = landingAssistControllerRef.current.step(
+          input,
+          curTelemetry,
+          detection,
+          dt
+        );
+
+        // Only apply AI guidance if pilot explicitly opted in
+        if (isLandingAssistEnabledRef.current) {
+          if (!landingAssistControllerRef.current.getIsEnabled()) {
+            // FSM disengaged (e.g. manual pilot stick override or go-around completion)
+            isLandingAssistEnabledRef.current = false;
+            setIsLandingAssistEnabled(false);
+          } else {
+            input.pitch = assistedInput.pitch;
+            input.roll = assistedInput.roll;
+            input.throttle = assistedInput.throttle;
+            input.hoverHold = assistedInput.hoverHold;
+          }
+          if (landingAssistControllerRef.current.getState() === "COMPLETE") {
+            physics.isArmed = false;
+          }
+        }
+      }
+
+      // Step Physics via Canonical Simulation Clock (Fixed-Timestep Accumulator)
       simClockRef.current.tick((fixedDt) => {
         curTelemetry = physics.update(input, fixedDt);
         TelemetryBus.getInstance().publish(curTelemetry, fixedDt);
@@ -1276,6 +1363,21 @@ export function FlightSimulator({ selectedDrone, initialDigitalTwin, onExit }: F
       if (telemetryThrottleTimer >= 0.05) {
         telemetryThrottleTimer = 0;
         setTelemetry({ ...curTelemetry });
+        if (inferenceEngineRef.current) {
+          const det = inferenceEngineRef.current.getLatestResult();
+          setVisionDetection({ ...det });
+          const assistStat = landingAssistControllerRef.current.getStatus(curTelemetry, det);
+          setLandingAssistStatus(assistStat);
+          if (typeof window !== "undefined") {
+            (window as any).__DRONE_PILOT_VISION_STATE__ = {
+              detection: det,
+              assistStatus: assistStat,
+              isAssistEnabled: isLandingAssistEnabledRef.current,
+              telemetry: curTelemetry,
+              isModelReady: inferenceEngineRef.current.isReady(),
+            };
+          }
+        }
         setClockSnapshot(simClockRef.current.getSnapshot());
         if (simulationAdapterRef.current) {
           setAdapterStatus(simulationAdapterRef.current.getStatus());
@@ -1349,6 +1451,8 @@ export function FlightSimulator({ selectedDrone, initialDigitalTwin, onExit }: F
       });
       scene.remove(remoteDroneMgr.group);
       renderer.dispose();
+      visionEngine.dispose();
+      inferenceEngineRef.current = null;
       
       if (audioManagerRef.current) {
         audioManagerRef.current.dispose();
@@ -1408,7 +1512,7 @@ export function FlightSimulator({ selectedDrone, initialDigitalTwin, onExit }: F
 
         {/* Tactical Dropzone Deployment Briefing Banner */}
         {!isLoading && showDropBriefing && (
-          <div className="absolute top-4 left-1/2 -translate-x-1/2 z-30 pointer-events-none animate-in fade-in slide-in-from-top-2 duration-300">
+          <div className="absolute top-16 left-1/2 -translate-x-1/2 z-40 pointer-events-none animate-in fade-in slide-in-from-top-2 duration-300">
             <div className="bg-black/70 backdrop-blur-md text-white/80 border border-white/10 px-4 py-2 rounded-full shadow-lg flex items-center gap-3 font-mono select-none">
               <div className="w-2 h-2 rounded-full bg-[#FF5500] animate-ping shrink-0" />
               <div className="text-[11px] tracking-widest">
@@ -1420,6 +1524,15 @@ export function FlightSimulator({ selectedDrone, initialDigitalTwin, onExit }: F
             </div>
           </div>
         )}
+
+        {/* Phase E: Vision Precision Landing Diagnostic HUD Overlay */}
+        <VisionLandingOverlay
+          detection={visionDetection}
+          assistStatus={landingAssistStatus}
+          isAssistEnabled={isLandingAssistEnabled}
+          onToggleAssist={handleToggleLandingAssist}
+          offscreenCanvas={inferenceEngineRef.current?.getOffscreenCanvas() || null}
+        />
 
         {/* Avionics Telemetry HUD */}
         <TelemetryHUD

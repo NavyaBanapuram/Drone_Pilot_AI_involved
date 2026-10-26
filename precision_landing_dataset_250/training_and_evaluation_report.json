@@ -1,0 +1,303 @@
+{
+  "model_architecture": "ResNeXt-50 (resnext50_32x4d)",
+  "training_environment": "CPU (PyTorch 2.14.0+cpu)",
+  "total_training_duration_seconds": 938.11,
+  "epochs": 10,
+  "dataset": "precision_landing_dataset_250",
+  "split_counts": {
+    "train": 180,
+    "val": 40,
+    "test": 30
+  },
+  "best_checkpoint": "models/best_precision_landing_model.pt",
+  "best_epoch": 10,
+  "test_metrics": {
+    "samples": 30,
+    "tp": 14,
+    "fp": 0,
+    "tn": 10,
+    "fn": 6,
+    "accuracy": 0.8,
+    "precision": 1.0,
+    "recall": 0.7,
+    "f1": 0.8235294117647058,
+    "fpr": 0.0,
+    "mean_center_pixel_error": 38.87269866913557,
+    "median_center_pixel_error": 36.01407861709595,
+    "mean_center_norm_error": 0.17353883334435521,
+    "mean_iou": 0.35962459444999695,
+    "scene_accuracy": 0.8
+  },
+  "training_history": [
+    {
+      "epoch": 1,
+      "duration_s": 135.31,
+      "train": {
+        "loss": 1.8381863858964709,
+        "conf_loss": 0.47329920132954917,
+        "loc_loss": 0.0840842260254754,
+        "scene_loss": 2.393437475628323
+      },
+      "val": {
+        "samples": 40,
+        "tp": 0,
+        "fp": 0,
+        "tn": 16,
+        "fn": 24,
+        "accuracy": 0.4,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "fpr": 0.0,
+        "mean_center_pixel_error": 80.12550516923268,
+        "median_center_pixel_error": 89.01515817642212,
+        "mean_center_norm_error": 0.35770314807693165,
+        "mean_iou": 0.226811483502388,
+        "scene_accuracy": 0.25
+      }
+    },
+    {
+      "epoch": 2,
+      "duration_s": 90.28,
+      "train": {
+        "loss": 1.7234295633104113,
+        "conf_loss": 0.5396454970041911,
+        "loc_loss": 0.05374800498700804,
+        "scene_loss": 2.1525760862562393
+      },
+      "val": {
+        "samples": 40,
+        "tp": 24,
+        "fp": 16,
+        "tn": 0,
+        "fn": 0,
+        "accuracy": 0.6,
+        "precision": 0.6,
+        "recall": 1.0,
+        "f1": 0.7499999999999999,
+        "fpr": 1.0,
+        "mean_center_pixel_error": 70.6370659271876,
+        "median_center_pixel_error": 71.66317892074585,
+        "mean_center_norm_error": 0.3153440443178018,
+        "mean_iou": 0.2749195992946625,
+        "scene_accuracy": 0.25
+      }
+    },
+    {
+      "epoch": 3,
+      "duration_s": 93.09,
+      "train": {
+        "loss": 1.3801856915156046,
+        "conf_loss": 0.4084601415528191,
+        "loc_loss": 0.05044134797321426,
+        "scene_loss": 1.7416856977674695
+      },
+      "val": {
+        "samples": 40,
+        "tp": 16,
+        "fp": 6,
+        "tn": 10,
+        "fn": 8,
+        "accuracy": 0.65,
+        "precision": 0.7272727272727273,
+        "recall": 0.6666666666666666,
+        "f1": 0.6956521739130435,
+        "fpr": 0.375,
+        "mean_center_pixel_error": 53.30216212073962,
+        "median_center_pixel_error": 57.95793867111206,
+        "mean_center_norm_error": 0.23795608089615902,
+        "mean_iou": 0.23800118267536163,
+        "scene_accuracy": 0.5
+      }
+    },
+    {
+      "epoch": 4,
+      "duration_s": 85.3,
+      "train": {
+        "loss": 1.0119208998150295,
+        "conf_loss": 0.2980670405758752,
+        "loc_loss": 0.046102810899416605,
+        "scene_loss": 1.2432964457405937
+      },
+      "val": {
+        "samples": 40,
+        "tp": 17,
+        "fp": 6,
+        "tn": 10,
+        "fn": 7,
+        "accuracy": 0.675,
+        "precision": 0.7391304347826086,
+        "recall": 0.7083333333333334,
+        "f1": 0.723404255319149,
+        "fpr": 0.375,
+        "mean_center_pixel_error": 56.360686798890434,
+        "median_center_pixel_error": 59.27705097198486,
+        "mean_center_norm_error": 0.251610208923618,
+        "mean_iou": 0.3594508171081543,
+        "scene_accuracy": 0.25
+      }
+    },
+    {
+      "epoch": 5,
+      "duration_s": 83.8,
+      "train": {
+        "loss": 1.0755762762493557,
+        "conf_loss": 0.33905357122421265,
+        "loc_loss": 0.04322935309675005,
+        "scene_loss": 1.3001279830932617
+      },
+      "val": {
+        "samples": 40,
+        "tp": 14,
+        "fp": 6,
+        "tn": 10,
+        "fn": 10,
+        "accuracy": 0.6,
+        "precision": 0.7,
+        "recall": 0.5833333333333334,
+        "f1": 0.6363636363636365,
+        "fpr": 0.375,
+        "mean_center_pixel_error": 71.18530750274658,
+        "median_center_pixel_error": 75.09169864654541,
+        "mean_center_norm_error": 0.31779155135154724,
+        "mean_iou": 0.2702629268169403,
+        "scene_accuracy": 0.55
+      }
+    },
+    {
+      "epoch": 6,
+      "duration_s": 80.37,
+      "train": {
+        "loss": 0.9221559445063273,
+        "conf_loss": 0.2729976097742716,
+        "loc_loss": 0.04215073494447602,
+        "scene_loss": 1.1297136969036525
+      },
+      "val": {
+        "samples": 40,
+        "tp": 17,
+        "fp": 6,
+        "tn": 10,
+        "fn": 7,
+        "accuracy": 0.675,
+        "precision": 0.7391304347826086,
+        "recall": 0.7083333333333334,
+        "f1": 0.723404255319149,
+        "fpr": 0.375,
+        "mean_center_pixel_error": 53.81540993601084,
+        "median_center_pixel_error": 55.45547652244568,
+        "mean_center_norm_error": 0.24024736578576267,
+        "mean_iou": 0.36483168601989746,
+        "scene_accuracy": 0.45
+      }
+    },
+    {
+      "epoch": 7,
+      "duration_s": 87.88,
+      "train": {
+        "loss": 0.8844759755664402,
+        "conf_loss": 0.2958679795265198,
+        "loc_loss": 0.0397569606701533,
+        "scene_loss": 1.0181881268819173
+      },
+      "val": {
+        "samples": 40,
+        "tp": 20,
+        "fp": 6,
+        "tn": 10,
+        "fn": 4,
+        "accuracy": 0.75,
+        "precision": 0.7692307692307693,
+        "recall": 0.8333333333333334,
+        "f1": 0.8,
+        "fpr": 0.375,
+        "mean_center_pixel_error": 58.012813717126846,
+        "median_center_pixel_error": 62.04670715332031,
+        "mean_center_norm_error": 0.2589857755228877,
+        "mean_iou": 0.2693924605846405,
+        "scene_accuracy": 0.775
+      }
+    },
+    {
+      "epoch": 8,
+      "duration_s": 88.58,
+      "train": {
+        "loss": 0.7560822327931722,
+        "conf_loss": 0.23976355724864537,
+        "loc_loss": 0.03686300247079796,
+        "scene_loss": 0.8851853635576036
+      },
+      "val": {
+        "samples": 40,
+        "tp": 21,
+        "fp": 6,
+        "tn": 10,
+        "fn": 3,
+        "accuracy": 0.775,
+        "precision": 0.7777777777777778,
+        "recall": 0.875,
+        "f1": 0.823529411764706,
+        "fpr": 0.375,
+        "mean_center_pixel_error": 57.65939287468791,
+        "median_center_pixel_error": 62.73608207702637,
+        "mean_center_norm_error": 0.25740800390485674,
+        "mean_iou": 0.34562182426452637,
+        "scene_accuracy": 0.575
+      }
+    },
+    {
+      "epoch": 9,
+      "duration_s": 91.03,
+      "train": {
+        "loss": 0.7315864536497328,
+        "conf_loss": 0.2084074894587199,
+        "loc_loss": 0.03531405578056971,
+        "scene_loss": 0.9051017204920451
+      },
+      "val": {
+        "samples": 40,
+        "tp": 23,
+        "fp": 6,
+        "tn": 10,
+        "fn": 1,
+        "accuracy": 0.825,
+        "precision": 0.7931034482758621,
+        "recall": 0.9583333333333334,
+        "f1": 0.8679245283018867,
+        "fpr": 0.375,
+        "mean_center_pixel_error": 57.23319428662459,
+        "median_center_pixel_error": 63.069584369659424,
+        "mean_center_norm_error": 0.2555053316367169,
+        "mean_iou": 0.34446772933006287,
+        "scene_accuracy": 0.625
+      }
+    },
+    {
+      "epoch": 10,
+      "duration_s": 100.77,
+      "train": {
+        "loss": 0.659822056028578,
+        "conf_loss": 0.19565426111221312,
+        "loc_loss": 0.03217509686946869,
+        "scene_loss": 0.7996352195739747
+      },
+      "val": {
+        "samples": 40,
+        "tp": 23,
+        "fp": 6,
+        "tn": 10,
+        "fn": 1,
+        "accuracy": 0.825,
+        "precision": 0.7931034482758621,
+        "recall": 0.9583333333333334,
+        "f1": 0.8679245283018867,
+        "fpr": 0.375,
+        "mean_center_pixel_error": 57.10622017582258,
+        "median_center_pixel_error": 62.71972990036011,
+        "mean_center_norm_error": 0.2549384829277794,
+        "mean_iou": 0.3383199870586395,
+        "scene_accuracy": 0.65
+      }
+    }
+  ]
+}

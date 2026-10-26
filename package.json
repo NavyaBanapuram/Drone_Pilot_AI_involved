@@ -10,15 +10,21 @@
     "test:digital-twin": "tsx src/__tests__/digital-twin.test.ts",
     "test:telemetry": "tsx src/__tests__/flight-recorder.test.ts",
     "test:dataset": "tsx src/__tests__/dataset-generation.test.ts",
-    "test:all": "tsx src/__tests__/digital-twin.test.ts && tsx src/__tests__/flight-recorder.test.ts && tsx src/__tests__/dataset-generation.test.ts",
+    "test:assist": "tsx src/__tests__/landing-assist.test.ts",
+    "test:sink-rate": "tsx src/__tests__/touchdown-sink-rate.test.ts",
+    "test:eval": "tsx src/__tests__/precision-landing-evaluation.test.ts",
+    "test:all": "tsx src/__tests__/digital-twin.test.ts && tsx src/__tests__/flight-recorder.test.ts && tsx src/__tests__/dataset-generation.test.ts && tsx src/__tests__/landing-assist.test.ts && tsx src/__tests__/touchdown-sink-rate.test.ts && tsx src/__tests__/precision-landing-evaluation.test.ts",
     "dataset:generate": "node scripts/generate_pilot_dataset.mjs",
-    "dataset:verify": "node scripts/verify_dataset_files.mjs"
+    "dataset:verify": "node scripts/verify_dataset_files.mjs",
+    "model:setup": "node scripts/setup_model.mjs",
+    "model:verify": "node scripts/setup_model.mjs --verify"
   },
   "dependencies": {
     "clsx": "^2.1.1",
     "firebase": "^11.3.1",
     "lucide-react": "^0.475.0",
     "next": "^15.1.7",
+    "onnxruntime-web": "^1.30.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "tailwind-merge": "^2.6.0",

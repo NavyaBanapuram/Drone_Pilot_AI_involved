@@ -1,0 +1,32 @@
+{
+  "onnx_model_path": "models/precision_landing_resnext50.onnx",
+  "onnx_size_mb": 100.48,
+  "is_self_contained": true,
+  "input_tensor": "image [1, 3, 224, 224] float32",
+  "output_tensors": {
+    "confidence": "[1, 1] float32",
+    "center": "[1, 2] float32",
+    "bbox": "[1, 4] float32",
+    "scene_probs": "[1, 8] float32"
+  },
+  "parity_max_abs_diffs": {
+    "confidence": 1.4901161193847656e-08,
+    "center": 5.960464477539063e-08,
+    "bbox": 5.960464477539063e-08,
+    "scene": 1.862645149230957e-08
+  },
+  "sample_predictions": {
+    "confidence": 0.16587042808532715,
+    "center": [
+      0.5513980984687805,
+      0.5937490463256836
+    ],
+    "bbox": [
+      0.11160025000572205,
+      0.18614768981933594,
+      0.9393320083618164,
+      0.9417802095413208
+    ],
+    "predicted_scene": "Lawn"
+  }
+}

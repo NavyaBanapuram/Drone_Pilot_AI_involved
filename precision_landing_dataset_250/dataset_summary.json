@@ -1,0 +1,53 @@
+{
+  "datasetName": "DronePilot-Precision-Landing-Dataset",
+  "totalSamples": 250,
+  "validTargetsCount": 188,
+  "invalidTargetsCount": 62,
+  "negativeSamplePercentage": 24.8,
+  "countsByHelipad": {
+    "training-alpha": 30,
+    "training-bravo": 30,
+    "forest-alpha": 30,
+    "mountain-alpha": 30,
+    "river-alpha": 30,
+    "city-alpha": 30,
+    "city-apex-rooftop": 30,
+    "industrial-alpha": 20,
+    "coast-alpha": 20
+  },
+  "countsBySceneCategory": {
+    "Building": 30,
+    "Field": 30,
+    "Lawn": 30,
+    "Mountain": 30,
+    "Road": 60,
+    "Vehicles": 20,
+    "WaterArea": 20,
+    "Wilderness": 30
+  },
+  "countsByVisibility": {
+    "FULLY_VISIBLE": 91,
+    "PARTIALLY_VISIBLE": 124,
+    "OUT_OF_FRAME": 35,
+    "BEHIND_CAMERA": 0,
+    "EXCESSIVE_DISTANCE": 0
+  },
+  "countsByInvalidReason": {
+    "NONE": 188,
+    "OUT_OF_FRAME": 35,
+    "BEHIND_CAMERA": 0,
+    "ALTITUDE_OUT_OF_RANGE": 0,
+    "EXTREME_TILT": 0,
+    "TOO_FAR_OFF_AXIS": 27
+  },
+  "altitudeDistributionMeters": {
+    "min": 1.5,
+    "max": 34.9,
+    "mean": 19
+  },
+  "splits": {
+    "train": 180,
+    "val": 40,
+    "test": 30
+  }
+}
