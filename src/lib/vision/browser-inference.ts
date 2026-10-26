@@ -75,9 +75,13 @@ export class BrowserInferenceEngine {
   }
 
   /**
-   * Asynchronously loads the ONNX Runtime Web session from public asset path.
+   * Asynchronously loads the ONNX Runtime Web session from public asset path or external CDN URL.
    */
-  public async loadModel(modelPath = "/models/precision_landing_resnext50.onnx"): Promise<boolean> {
+  public async loadModel(
+    modelPath = typeof process !== "undefined" && process.env?.NEXT_PUBLIC_MODEL_URL
+      ? process.env.NEXT_PUBLIC_MODEL_URL
+      : "/models/precision_landing_resnext50.onnx"
+  ): Promise<boolean> {
     if (this.isModelLoaded || this.isLoading) return this.isModelLoaded;
     if (typeof window === "undefined") return false;
 
@@ -102,9 +106,9 @@ export class BrowserInferenceEngine {
       this.latestResult.status = "IDLE";
       return true;
     } catch (err: any) {
-      console.warn("BrowserInferenceEngine: Failed to load ONNX model via ONNX Runtime Web:", err?.message || err);
+      console.warn("BrowserInferenceEngine: Note - ONNX model not loaded or blocked by CORS:", err?.message || err);
       this.isLoading = false;
-      this.loadError = err?.message || "Failed to load model";
+      this.loadError = err?.message || "Model unavailable";
       this.latestResult.status = "ERROR";
       this.latestResult.errorMessage = this.loadError || undefined;
       return false;

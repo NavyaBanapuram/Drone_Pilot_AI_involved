@@ -1134,7 +1134,8 @@ export function FlightSimulator({ selectedDrone, initialDigitalTwin, onExit }: F
     const visionEngine = new BrowserInferenceEngine(100);
     inferenceEngineRef.current = visionEngine;
     visionEngine.initOffscreenRenderer();
-    visionEngine.loadModel("/models/precision_landing_resnext50.onnx");
+    const targetModelUrl = process.env.NEXT_PUBLIC_MODEL_URL || "/models/precision_landing_resnext50.onnx";
+    visionEngine.loadModel(targetModelUrl);
 
     // 12. ANIMATION & SIMULATION LOOP
     let animationId: number;
@@ -1525,14 +1526,16 @@ export function FlightSimulator({ selectedDrone, initialDigitalTwin, onExit }: F
           </div>
         )}
 
-        {/* Phase E: Vision Precision Landing Diagnostic HUD Overlay */}
-        <VisionLandingOverlay
-          detection={visionDetection}
-          assistStatus={landingAssistStatus}
-          isAssistEnabled={isLandingAssistEnabled}
-          onToggleAssist={handleToggleLandingAssist}
-          offscreenCanvas={inferenceEngineRef.current?.getOffscreenCanvas() || null}
-        />
+        {/* Phase E: Vision Precision Landing Diagnostic HUD Overlay (only after 3D scene finishes initializing) */}
+        {!isLoading && (
+          <VisionLandingOverlay
+            detection={visionDetection}
+            assistStatus={landingAssistStatus}
+            isAssistEnabled={isLandingAssistEnabled}
+            onToggleAssist={handleToggleLandingAssist}
+            offscreenCanvas={inferenceEngineRef.current?.getOffscreenCanvas() || null}
+          />
+        )}
 
         {/* Avionics Telemetry HUD */}
         <TelemetryHUD

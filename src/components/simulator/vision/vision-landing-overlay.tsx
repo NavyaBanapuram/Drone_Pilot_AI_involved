@@ -71,15 +71,16 @@ export function VisionLandingOverlay({
         return "text-amber-300 border-amber-500/60 bg-amber-950/80 animate-pulse";
       case "ABORT_OR_GO_AROUND":
       case "INVALID":
-      case "ERROR":
         return "text-rose-300 border-rose-500/60 bg-rose-950/80 animate-pulse";
+      case "ERROR":
+        return "text-amber-300 border-amber-500/50 bg-amber-950/60";
       default:
         return "text-neutral-300 border-neutral-700 bg-neutral-900/80";
     }
   };
 
   const getStatusDotColor = () => {
-    if (detection.status === "ERROR") return "bg-rose-500 animate-ping";
+    if (detection.status === "ERROR") return "bg-amber-400/80";
     if (detection.status === "LOADING") return "bg-sky-400 animate-pulse";
     if (detection.isDetected) return "bg-emerald-400 shadow-[0_0_8px_#34d399]";
     if (detection.status === "IDLE" || detection.status === "NO_TARGET") return "bg-amber-400";
@@ -119,7 +120,7 @@ export function VisionLandingOverlay({
             : detection.isDetected
             ? `LOCKED: ${detection.predictedScene}`
             : detection.status === "ERROR"
-            ? "MODEL ERROR"
+            ? "VISION STANDBY"
             : "SEARCHING PAD"}
         </div>
 
@@ -236,6 +237,16 @@ export function VisionLandingOverlay({
                   </div>
                 </div>
               </>
+            ) : detection.status === "ERROR" ? (
+              <div className="relative z-10 text-[10px] text-amber-300 flex flex-col items-center gap-1 bg-neutral-950/90 px-3 py-1.5 rounded-lg border border-amber-500/30 text-center max-w-[190px]">
+                <div className="flex items-center gap-1.5 font-bold uppercase tracking-wider">
+                  <AlertTriangle className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                  <span>AI Vision Standby</span>
+                </div>
+                <span className="text-[9px] text-neutral-400 font-sans">
+                  Manual flight active. Provide NEXT_PUBLIC_MODEL_URL to enable AI helipad assist.
+                </span>
+              </div>
             ) : (
               <div className="relative z-10 text-[11px] text-neutral-400 uppercase tracking-widest flex items-center gap-2 bg-neutral-950/80 px-3 py-1.5 rounded-full border border-neutral-800">
                 <Target className="w-4 h-4 text-amber-400 animate-pulse" />
